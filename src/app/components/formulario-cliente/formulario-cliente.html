@@ -1,0 +1,47 @@
+<p-button (onClick)="toogleVisibility()">Mostrar</p-button>
+
+<p-dialog [(visible)]="visible">
+  <app-formulario-input
+    type="text"
+    label="Nome"
+    placeholder="John Doe"
+    formControlName="name"
+  />
+  <app-formulario-input
+    type="email"
+    label="Email"
+    placeholder="example@example.com"
+    formControlName="email"
+  />
+  <app-formulario-input
+    type="text"
+    label="CPF"
+    placeholder="123.456.789-00"
+    mask="999.999.999-99"
+    formControlName="cpf"
+  />
+  <app-formulario-input
+    type="date"
+    label="Data de Nascimento"
+    formControlName="birthday"
+  />
+  <app-formulario-input
+    type="text"
+    label="Contato"
+    placeholder="(99) 99999-9999"
+    mask="(99) 99999-9999"
+    formControlName="contact"
+  />
+  <app-formulario-input
+    type="text"
+    label="País"
+    placeholder="Brasil"
+    formControlName="country"
+  />
+  <app-formulario-input
+    type="text"
+    label="Estado"
+    placeholder="São Paulo"
+    formControlName="state"
+  />
+</p-dialog>
