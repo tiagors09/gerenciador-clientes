@@ -1,4 +1,5 @@
-<app-formulario-cliente></app-formulario-cliente>
+<p-button (onClick)="abrirFormulario()" label="Novo Cliente" class="p-mb-3"></p-button>
+
 <div class="p-grid p-ai-center p-mb-3">
   <div class="p-col-12 p-md-4">
     <input type="text" pInputText placeholder="Filtrar por nome" [(ngModel)]="nomeFiltro" />
@@ -20,7 +21,7 @@
           <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
         </ng-template>
         <ng-template pTemplate="footer">
-          <button pButton label="Editar" icon="pi pi-pencil" class="p-button-sm p-mr-2"></button>
+          <button pButton label="Editar" icon="pi pi-pencil" class="p-button-sm p-mr-2" (click)="abrirFormulario(cliente)"></button>
           <button pButton label="Remover" icon="pi pi-trash" class="p-button-sm p-button-danger" (click)="remover(cliente)"></button>
         </ng-template>
       </p-card>
@@ -35,3 +36,10 @@
   (onPageChange)="aoPaginar($event)"
   styleClass="p-mt-3">
 </p-paginator>
+
+<app-formulario-cliente
+  [visible]="formVisible"
+  [cliente]="clienteSelecionado"
+  (visibleChange)="formVisible = $event"
+  (salvar)="salvarCliente($event)">
+</app-formulario-cliente>

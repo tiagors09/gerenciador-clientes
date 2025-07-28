@@ -10,7 +10,7 @@ export class ClienteService {
   private clientesSubject = new BehaviorSubject<Cliente[]>([]);
   clientes$ = this.clientesSubject.asObservable();
 
-  private apiUrl = 'http://localhost:3000/clientes';
+  private apiUrl = 'http://localhost:3000/clientes'; // seu endpoint REST (JSON-server, por exemplo)
 
   constructor(private http: HttpClient, private messageService: MessageService) {
     this.loadClientes();

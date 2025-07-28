@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Cliente } from '../../models/cliente';
-import { ClienteService } from '../../services/cliente-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -8,6 +7,8 @@ import { PaginatorModule } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { FormularioClienteComponent } from '../formulario-cliente/formulario-cliente';
+import { MessageService } from 'primeng/api';
+import { ClienteService } from '../../services/cliente-service';
 
 @Component({
   selector: 'app-clientes-list',
@@ -20,9 +21,10 @@ import { FormularioClienteComponent } from '../formulario-cliente/formulario-cli
     InputTextModule,
     ButtonModule,
     FormularioClienteComponent,
-],
+  ],
+  providers: [MessageService,],
   templateUrl: './clientes-list.html',
-  styleUrl: './clientes-list.scss'
+  styleUrls: ['./clientes-list.scss']
 })
 export class ClientesListComponent implements OnInit {
   clientes: Cliente[] = [];
@@ -31,7 +33,13 @@ export class ClientesListComponent implements OnInit {
   paginaAtual = 0;
   itensPorPagina = 6;
 
-  constructor(private clienteService: ClienteService) {}
+  formVisible = false;
+  clienteSelecionado: Cliente | null = null;
+
+  constructor(
+    private clienteService: ClienteService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(data => {
@@ -49,6 +57,22 @@ export class ClientesListComponent implements OnInit {
   }
 
   remover(cliente: Cliente) {
-    this.clienteService.remover(cliente.id);
+    if (cliente.id && confirm('Deseja realmente remover este cliente?')) {
+      this.clienteService.remover(cliente.id);
+    }
+  }
+
+  abrirFormulario(cliente?: Cliente) {
+    if (cliente) {
+      this.clienteSelecionado = { ...cliente };
+    } else {
+      this.clienteSelecionado = null;
+    }
+    this.formVisible = true;
+  }
+
+  salvarCliente(cliente: Cliente) {
+    this.clienteService.adicionar(cliente);
+    this.formVisible = false;
   }
 }
