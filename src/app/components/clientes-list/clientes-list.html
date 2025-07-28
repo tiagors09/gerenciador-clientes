@@ -1,4 +1,4 @@
-<div class="p-grid p-justify-between p-mb-3">
+<div class="p-grid p-ai-center p-mb-3">
   <div class="p-col-12 p-md-4">
     <input type="text" pInputText placeholder="Filtrar por nome" [(ngModel)]="nomeFiltro" />
   </div>
@@ -6,17 +6,17 @@
     <input type="text" pInputText placeholder="Filtrar por cidade" [(ngModel)]="cidadeFiltro" />
   </div>
   <div class="p-col-12 p-md-4">
-    <button pButton label="Filtrar" icon="pi pi-search" (click)="aplicarFiltro()"></button>
+    <button pButton label="Filtrar" icon="pi pi-search" (click)="aplicarFiltro()" class="w-full"></button>
   </div>
 </div>
 
 <div class="p-grid">
   <ng-container *ngFor="let cliente of clientes | slice:paginaAtual:(paginaAtual + itensPorPagina)">
-    <div class="p-col-12 p-md-4">
-      <p-card header="{{ cliente.nome }}" subheader="{{ cliente.cidade }}">
+    <div class="p-col-12 p-sm-6 p-md-4">
+      <p-card [header]="cliente.nome" [subheader]="cliente.cidade">
         <ng-template pTemplate="content">
-          <p>Email: {{ cliente.email }}</p>
-          <p>CPF: {{ cliente.cpf }}</p>
+          <p><strong>Email:</strong> {{ cliente.email }}</p>
+          <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
         </ng-template>
         <ng-template pTemplate="footer">
           <button pButton label="Editar" icon="pi pi-pencil" class="p-button-sm p-mr-2"></button>
@@ -31,5 +31,6 @@
   [rows]="itensPorPagina"
   [totalRecords]="clientes.length"
   [rowsPerPageOptions]="[6, 12, 24]"
-  (onPageChange)="aoPaginar($event)">
+  (onPageChange)="aoPaginar($event)"
+  styleClass="p-mt-3">
 </p-paginator>

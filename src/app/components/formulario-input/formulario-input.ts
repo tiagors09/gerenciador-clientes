@@ -1,50 +1,41 @@
-import { Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { InputMask } from "primeng/inputmask";
-import { InputTextModule } from 'primeng/inputtext';
+import { Component, forwardRef, Input } from "@angular/core";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
   selector: 'app-formulario-input',
-  imports: [
-    InputMask,
-    InputTextModule
-  ],
+  templateUrl: './formulario-input.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => FormularioInput),
+      useExisting: forwardRef(() => FormularioInputComponent),
       multi: true,
-    }
+    },
   ],
-  templateUrl: './formulario-input.html',
-  styleUrls: ['./formulario-input.scss']
 })
-export class FormularioInput implements ControlValueAccessor {
-  @Input() mask!: string;
-  @Input() placeholder!: string;
-  @Input() type!: string;
+export class FormularioInputComponent implements ControlValueAccessor {
   @Input() label!: string;
+  @Input() placeholder: string = '';
+  @Input() type: string = 'text';
+  @Input() mask?: string;
 
-  value: string = '';
-  onChange: any = () => {};
-  onTouched: any = () => {};
+  value: any;
+  onChange = (value: any) => {};
+  onTouched = () => {};
 
   writeValue(value: any): void {
     this.value = value;
   }
-
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
-
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {}
-
-  onInput(event: Event) {
-    const value = (event?.target as HTMLInputElement).value;
+  onInput(event: any) {
+    const value = event.target.value;
+    this.value = value;
     this.onChange(value);
+    this.onTouched();
   }
 }
