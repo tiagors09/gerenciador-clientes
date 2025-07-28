@@ -1,18 +1,23 @@
 <span class="font-bold block mb-2">{{ label }}</span>
+
 @if (mask != null) {
   <p-inputMask
     [mask]="mask"
     [placeholder]="placeholder"
-    [attr.value]="value"
     [type]="type"
-    (input)="onInput($event)"
-  ></p-inputMask>
+    [attr.ngModel]="value"
+    (ngModelChange)="onInput($event)"
+    (blur)="onTouched()"
+    class="w-full"
+  />
 } @else {
   <input
     pInputText
     [type]="type"
     [placeholder]="placeholder"
-    [attr.value]="value"
-    (input)="onInput($event)"
+    [attr.ngModel]="value"
+    (ngModelChange)="onInput($event)"
+    (blur)="onTouched()"
+    class="w-full"
   />
 }

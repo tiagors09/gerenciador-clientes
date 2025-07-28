@@ -1,11 +1,11 @@
-// src/app/components/formulario-cliente/formulario-cliente.component.ts
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputMaskModule } from 'primeng/inputmask';
+import { FormularioInputComponent } from '../formulario-input/formulario-input';
 
 @Component({
   selector: 'app-formulario-cliente',
@@ -16,14 +16,20 @@ import { InputMaskModule } from 'primeng/inputmask';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    InputMaskModule
+    InputMaskModule,
+    FormularioInputComponent
   ],
   templateUrl: './formulario-cliente.html',
-  styleUrl: './formulario-cliente.scss'
+  styleUrls: ['./formulario-cliente.scss']
 })
-export class FormularioClienteComponent {
-  visible: boolean = false;
+export class FormularioClienteComponent implements OnChanges {
+  @Input() cliente: any | null = null;
+  @Input() visible: boolean = false;
+  @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() salvar = new EventEmitter<any>();
+
   form: FormGroup;
+  titulo: string = 'Novo Cliente';
 
   constructor() {
     this.form = new FormGroup({
@@ -50,20 +56,44 @@ export class FormularioClienteComponent {
     });
   }
 
-  toggleVisibility() {
-    this.visible = !this.visible;
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['cliente']) {
+      if (this.cliente) {
+        this.titulo = 'Editar Cliente';
+        this.form.patchValue({
+          name: this.cliente.name,
+          email: this.cliente.email,
+          cpf: this.cliente.cpf,
+          birthday: this.cliente.birthday,
+          contact: this.cliente.contact,
+          country: this.cliente.country,
+          state: this.cliente.state
+        });
+      } else {
+        this.titulo = 'Novo Cliente';
+        this.form.reset();
+      }
+    }
+
+    if (changes['visible'] && !this.visible) {
+      this.form.reset();
+      this.titulo = 'Novo Cliente';
+    }
   }
 
   onSubmit() {
     if (this.form.valid) {
-      console.log('Cliente salvo:', this.form.value);
+      this.salvar.emit(this.form.value);
       this.visible = false;
+      this.visibleChange.emit(false);
       this.form.reset();
+      this.titulo = 'Novo Cliente';
     }
   }
 
   private dataFuturaValidator(): ValidatorFn {
     return (control: AbstractControl) => {
+      if (!control.value) return null;
       const hoje = new Date();
       const data = new Date(control.value);
       return data > hoje ? { dataFutura: true } : null;

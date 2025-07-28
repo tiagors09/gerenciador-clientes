@@ -1,45 +1,84 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Cliente } from '../models/cliente';
-
+import { MessageService } from 'primeng/api';
 
 @Injectable({ providedIn: 'root' })
 export class ClienteService {
   private clientesSubject = new BehaviorSubject<Cliente[]>([]);
-  private todosClientes: Cliente[] = []; // armazena tudo
+  clientes$ = this.clientesSubject.asObservable();
 
-  constructor() {
-    // mock de dados iniciais
-    this.todosClientes = Array.from({ length: 25 }, (_, i) => ({
-      id: i + 1,
-      nome: `Cliente ${i + 1}`,
-      email: `cliente${i + 1}@teste.com`,
-      cpf: '000.000.000-00',
-      cidade: i % 2 === 0 ? 'Fortaleza' : 'Juazeiro',
-      estado: 'CE',
-    }));
-    this.clientesSubject.next(this.todosClientes);
+  private apiUrl = 'http://localhost:3000/clientes';
+
+  constructor(private http: HttpClient, private messageService: MessageService) {
+    this.loadClientes();
+  }
+
+  private loadClientes() {
+    this.http.get<Cliente[]>(this.apiUrl)
+      .pipe(
+        tap(clientes => this.clientesSubject.next(clientes)),
+        catchError(err => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar clientes' });
+          return of([]);
+        })
+      ).subscribe();
   }
 
   getClientes(): Observable<Cliente[]> {
-    return this.clientesSubject.asObservable();
+    return this.clientes$;
   }
 
   filtrar(nome: string, cidade: string) {
-    const filtrados = this.todosClientes.filter(cliente =>
-      cliente.nome.toLowerCase().includes(nome.toLowerCase()) &&
-      cliente.cidade.toLowerCase().includes(cidade.toLowerCase())
-    );
-    this.clientesSubject.next(filtrados);
+    this.http.get<Cliente[]>(this.apiUrl).subscribe(clientes => {
+      const filtrados = clientes.filter(c =>
+        c.nome.toLowerCase().includes(nome.toLowerCase()) &&
+        c.cidade.toLowerCase().includes(cidade.toLowerCase())
+      );
+      this.clientesSubject.next(filtrados);
+    });
   }
 
   remover(id: number) {
-    this.todosClientes = this.todosClientes.filter(c => c.id !== id);
-    this.clientesSubject.next(this.todosClientes);
+    this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente removido' });
+        this.loadClientes();
+      }),
+      catchError(err => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao remover cliente' });
+        return of(null);
+      })
+    ).subscribe();
   }
 
   adicionar(cliente: Cliente) {
-    this.todosClientes.push(cliente);
-    this.clientesSubject.next(this.todosClientes);
+    if (cliente.id) {
+      // editar
+      return this.http.put<Cliente>(`${this.apiUrl}/${cliente.id}`, cliente).pipe(
+        tap(() => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente atualizado' });
+          this.loadClientes();
+        }),
+        catchError(err => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao atualizar cliente' });
+          return of(null);
+        })
+      ).subscribe();
+    } else {
+      // novo cliente
+      return this.http.post<Cliente>(this.apiUrl, cliente).pipe(
+        tap(() => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente adicionado' });
+          this.loadClientes();
+        }),
+        catchError(err => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao adicionar cliente' });
+          return of(null);
+        })
+      ).subscribe();
+    }
   }
 }

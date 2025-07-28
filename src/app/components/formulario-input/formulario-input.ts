@@ -1,9 +1,15 @@
 import { Component, forwardRef, Input } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { InputMask } from "primeng/inputmask";
+import { InputTextModule } from "primeng/inputtext";
 
 @Component({
   selector: 'app-formulario-input',
   templateUrl: './formulario-input.html',
+  imports: [
+    InputMask,
+    InputTextModule,
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

@@ -7,6 +7,7 @@ import { CardModule } from 'primeng/card';
 import { PaginatorModule } from 'primeng/paginator';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { FormularioClienteComponent } from '../formulario-cliente/formulario-cliente';
 
 @Component({
   selector: 'app-clientes-list',
@@ -18,7 +19,8 @@ import { ButtonModule } from 'primeng/button';
     PaginatorModule,
     InputTextModule,
     ButtonModule,
-  ],
+    FormularioClienteComponent,
+],
   templateUrl: './clientes-list.html',
   styleUrl: './clientes-list.scss'
 })
